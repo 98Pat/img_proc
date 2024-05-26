@@ -21,7 +21,7 @@ var rgba64FilterConstructors = map[string]FilterConstructor{
 		if len(args) >= 1 {
 			ui32, err := strconv.ParseUint(args[0], 10, 32)
 			if err != nil {
-				return nil, errors.New("filter requires unsigned integer as first non-flag argument")
+				return nil, errors.New("filter requires color-step count (uint32) as first non-flag argument")
 			}
 			colorStep = uint16(ui32)
 		} else {
@@ -75,7 +75,7 @@ var rgbaFilterConstructors = map[string]FilterConstructor{
 		if len(args) >= 1 {
 			ui32, err := strconv.ParseUint(args[0], 10, 32)
 			if err != nil {
-				return nil, errors.New("filter requires unsigned integer (color steps) as first non-flag argument")
+				return nil, errors.New("filter requires color-step count (uint32) as first non-flag argument")
 			}
 			colorStep = 0xff / uint8(ui32)
 		} else {

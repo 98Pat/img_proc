@@ -12,7 +12,7 @@ import (
 var (
 	helpFlag      = flag.Bool("h", false, "display flag help")
 	imageFlag     = flag.String("i", "", "path to the image")
-	filterFlag    = flag.String("f", "", "type of filter to be applied\nlist of filters:\n\tblur\n\tinvert")
+	filterFlag    = flag.String("f", "", "type of filter to be applied\nlist of filters:\n\tblur\n\tinvert\n\tcomic\n\tspot\n\tedge")
 	iterationFlag = flag.Int("I", 1, "iteration count of filter")
 )
 

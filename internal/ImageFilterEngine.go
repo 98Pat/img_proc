@@ -105,7 +105,7 @@ func (engine *imageFilterEngine[T]) WriteOutputFile() error {
 	if fileName, err := engine.GetFileName(); err != nil {
 		return err
 	} else {
-		return WriteImageFile(fileName, *engine.outputImg)
+		return WriteImageFile(fileName, engine.outputImg)
 	}
 }
 
