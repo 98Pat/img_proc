@@ -79,28 +79,34 @@ func (iter *imageIterator[T]) Next() *imageIteratorYield {
 				iter.current.East = &iter.current.east
 			}
 		}
+
+		if iter.curY == iter.startY {
+			if iter.curY == 0 {
+				iter.current.North = nil
+			} else {
+				iter.current.north = iter.img.At(iter.curX, iter.curY-1)
+				iter.current.North = &iter.current.north
+			}
+
+			iter.current.south = iter.img.At(iter.curX, iter.curY+1)
+			iter.current.South = &iter.current.south
+		} else {
+			iter.current.north = iter.rowBufferNorth[iter.curX]
+			iter.current.North = &iter.current.north
+
+			if iter.curY+1 == iter.img.Bounds().Max.Y {
+				iter.current.South = nil
+			} else {
+				iter.current.south = iter.img.At(iter.curX, iter.curY+1)
+				iter.current.South = &iter.current.south
+			}
+		}
+
+		iter.rowBufferNorth[iter.curX] = iter.current.self
+		iter.rowBufferSouth[iter.curX] = iter.current.south
 	}
 
 	iter.current.Self = &iter.current.self
-
-	if iter.curY == iter.startY {
-		iter.current.North = nil
-		iter.current.south = iter.img.At(iter.curX, iter.curY+1)
-		iter.current.South = &iter.current.south
-	} else {
-		iter.current.north = iter.rowBufferNorth[iter.curX]
-		iter.current.North = &iter.current.north
-
-		if iter.curY+1 == iter.img.Bounds().Max.Y {
-			iter.current.South = nil
-		} else {
-			iter.current.south = iter.img.At(iter.curX, iter.curY+1)
-			iter.current.South = &iter.current.south
-		}
-	}
-
-	iter.rowBufferNorth[iter.curX] = iter.current.self
-	iter.rowBufferSouth[iter.curX] = iter.current.south
 
 	iter.curX++
 
