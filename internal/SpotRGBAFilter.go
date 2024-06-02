@@ -47,7 +47,7 @@ func (filter *SpotRGBAFilter) Apply(img, filteredImg *image.RGBA, startY, endY i
 			d := math.Sqrt(float64(dX*dX + dY*dY))
 
 			var r, b, g, a uint32 = (*curr.Self).RGBA()
-			spotAdjust(&r, &b, &g, &d, &filter.spotR, 0xff)
+			spotAdjust(&r, &g, &b, &d, &filter.spotR, 0xff)
 
 			filteredImg.SetRGBA(curr.X, curr.Y, color.RGBA{
 				uint8(r >> 8),
