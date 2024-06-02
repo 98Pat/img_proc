@@ -24,7 +24,7 @@ func (filter *SpotRGBA64Filter) Apply(img, filteredImg *image.RGBA64, startY, en
 			dX, dY := curr.X-filter.spotX, curr.Y-filter.spotY
 			d := math.Sqrt(float64(dX*dX + dY*dY))
 
-			var r, b, g, a uint32 = (*curr.Self).RGBA()
+			var r, g, b, a uint32 = (*curr.Self).RGBA()
 			spotAdjust(&r, &g, &b, &d, &filter.spotR, 0xffff)
 
 			filteredImg.SetRGBA64(curr.X, curr.Y, color.RGBA64{
@@ -46,7 +46,7 @@ func (filter *SpotRGBAFilter) Apply(img, filteredImg *image.RGBA, startY, endY i
 			dX, dY := filter.spotX-curr.X, filter.spotY-curr.Y
 			d := math.Sqrt(float64(dX*dX + dY*dY))
 
-			var r, b, g, a uint32 = (*curr.Self).RGBA()
+			var r, g, b, a uint32 = (*curr.Self).RGBA()
 			spotAdjust(&r, &g, &b, &d, &filter.spotR, 0xff)
 
 			filteredImg.SetRGBA(curr.X, curr.Y, color.RGBA{
