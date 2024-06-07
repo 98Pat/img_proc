@@ -20,7 +20,6 @@ func ReadImage(filepath string) (image.Image, error) {
 
 func WriteImage[T draw.Image](filepath string, img *T) (string, error) {
 	if ofs, err := os.Create(filepath); err != nil {
-		fmt.Println(err)
 		return "", err
 	} else {
 		defer ofs.Close()
