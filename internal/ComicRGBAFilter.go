@@ -7,9 +7,9 @@ import (
 )
 
 const (
-	redFactor   float64 = 0.2126
-	greenFactor float64 = 0.7152
-	blueFactor  float64 = 0.0722
+	INTENSITY_RED_FACTOR   float64 = 0.2126
+	INTENSITY_GREEN_FACTOR float64 = 0.7152
+	INTENSITY_BLUE_FACTOR  float64 = 0.0722
 )
 
 type ComicRGBA64Filter struct {
@@ -51,5 +51,5 @@ func calcIntensity(c *color.Color, bitSize uint32) float64 {
 	r >>= bitSize
 	g >>= bitSize
 	b >>= bitSize
-	return float64(r)*redFactor + float64(g)*greenFactor + float64(b)*blueFactor
+	return float64(r)*INTENSITY_RED_FACTOR + float64(g)*INTENSITY_GREEN_FACTOR + float64(b)*INTENSITY_BLUE_FACTOR
 }

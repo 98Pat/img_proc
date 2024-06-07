@@ -61,6 +61,9 @@ var rgba64FilterConstructors = map[string]FilterConstructor{
 		}
 		return &EdgeRGBA64Filter{amp}, nil
 	},
+	"heat": func(args []string) (interface{}, error) {
+		return &HeatRGBA64Filter{}, nil
+	},
 }
 
 var rgbaFilterConstructors = map[string]FilterConstructor{
@@ -114,6 +117,9 @@ var rgbaFilterConstructors = map[string]FilterConstructor{
 			amp = 1
 		}
 		return &EdgeRGBAFilter{amp}, nil
+	},
+	"heat": func(args []string) (interface{}, error) {
+		return &HeatRGBAFilter{}, nil
 	},
 }
 

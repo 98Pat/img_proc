@@ -10,10 +10,19 @@ import (
 )
 
 var (
-	helpFlag      = flag.Bool("h", false, "display flag help")
-	imageFlag     = flag.String("i", "", "path to the image")
-	filterFlag    = flag.String("f", "", "type of filter to be applied\nlist of filters:\n\tblur\n\tinvert\n\tcomic\n\tspot\n\tedge")
-	iterationFlag = flag.Int("I", 1, "iteration count of filter")
+	helpFlag   = flag.Bool("h", false, "display flag help")
+	imageFlag  = flag.String("i", "", "path to the image")
+	filterFlag = flag.String("f", "",
+		"type of filter to be applied\n"+
+			"list of filters:\n"+
+			"\tblur\n"+
+			"\tinvert\n"+
+			"\tcomic (color step count (int) default 3)\n"+
+			"\tspot (posX, posY, radius (int) required)\n"+
+			"\tedge (amplification (int) default 1)\n"+
+			"\theat")
+	iterationFlag      = flag.Int("I", 1, "iteration count of filter")
+	outputFilePathFlag = flag.String("o", "", "file output path")
 )
 
 func main() {
@@ -60,11 +69,11 @@ func main() {
 	switch _img := img.(type) {
 	case *image.RGBA64:
 		tmpImg := image.NewRGBA64(img.Bounds())
-		fe := internal.NewImageFilterEngine(*imageFlag, _img, tmpImg)
+		fe := internal.NewImageFilterEngine(*imageFlag, *outputFilePathFlag, _img, tmpImg)
 		filterEngine = fe
 	case *image.RGBA:
 		tmpImg := image.NewRGBA(img.Bounds())
-		fe := internal.NewImageFilterEngine(*imageFlag, _img, tmpImg)
+		fe := internal.NewImageFilterEngine(*imageFlag, *outputFilePathFlag, _img, tmpImg)
 		filterEngine = fe
 	default:
 		fmt.Println("unsupported image type")
@@ -85,15 +94,14 @@ func main() {
 	fmt.Printf("filter process took %d ms\n\n", time.Now().Sub(start).Milliseconds())
 
 	start = time.Now()
-	if fileName, err := filterEngine.GetFileName(); err != nil {
+	fmt.Println("writing file")
+
+	if filePath, err := filterEngine.WriteOutputFile(); err != nil {
 		fmt.Println(err)
 		return
 	} else {
-		fmt.Println("writing file", fileName)
+		fmt.Println("wrote file to: " + filePath)
 	}
-
-	// add filename as return of writeoutputfile, add flag for output filepath, default to inputfilepath+filtername
-	filterEngine.WriteOutputFile()
 
 	fmt.Println("done")
 	fmt.Printf("writing process took %d ms\n\n", time.Now().Sub(start).Milliseconds())

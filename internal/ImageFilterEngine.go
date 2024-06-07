@@ -15,23 +15,25 @@ type ImageFilterEngineInterface interface {
 	Run(int) error
 	SetFilter(string, []string) error
 	GetOutput() *draw.Image
-	GetFileName() (string, error)
-	WriteOutputFile() error
+	GetOutputFilePath() (string, error)
+	SetOutputFilePath(string)
+	WriteOutputFile() (string, error)
 }
 
 type imageFilterEngine[T draw.Image] struct {
-	filePath     string
-	filter       *ImageFilterer[T]
-	filterName   string
-	imgA         *T
-	imgB         *T
-	outputImg    *T
-	wg           sync.WaitGroup
-	switchBuffer bool
+	filePath       string
+	filter         *ImageFilterer[T]
+	filterName     string
+	outputFilePath string
+	imgA           *T
+	imgB           *T
+	outputImg      *T
+	wg             sync.WaitGroup
+	switchBuffer   bool
 }
 
-func NewImageFilterEngine[T draw.Image](filepath string, imgA, imgB T) *imageFilterEngine[T] {
-	return &imageFilterEngine[T]{filepath, nil, "", &imgA, &imgB, &imgB, sync.WaitGroup{}, false}
+func NewImageFilterEngine[T draw.Image](filePath, outputFilePath string, imgA, imgB T) *imageFilterEngine[T] {
+	return &imageFilterEngine[T]{filePath, nil, "", outputFilePath, &imgA, &imgB, &imgB, sync.WaitGroup{}, false}
 }
 
 func (engine *imageFilterEngine[T]) Run(iterations int) error {
@@ -93,7 +95,11 @@ func (engine *imageFilterEngine[T]) GetOutput() *draw.Image {
 	return &output
 }
 
-func (engine *imageFilterEngine[T]) GetFileName() (string, error) {
+func (engine *imageFilterEngine[T]) GetOutputFilePath() (string, error) {
+	if engine.outputFilePath != "" {
+		return engine.outputFilePath, nil
+	}
+
 	if engine.filter == nil {
 		return "", errors.New("filter not set")
 	} else {
@@ -101,11 +107,15 @@ func (engine *imageFilterEngine[T]) GetFileName() (string, error) {
 	}
 }
 
-func (engine *imageFilterEngine[T]) WriteOutputFile() error {
-	if fileName, err := engine.GetFileName(); err != nil {
-		return err
+func (engine *imageFilterEngine[T]) SetOutputFilePath(outputFilePath string) {
+	engine.outputFilePath = outputFilePath
+}
+
+func (engine *imageFilterEngine[T]) WriteOutputFile() (string, error) {
+	if fileName, err := engine.GetOutputFilePath(); err != nil {
+		return "", err
 	} else {
-		return WriteImageFile(fileName, engine.outputImg)
+		return WriteImage(fileName, engine.outputImg)
 	}
 }
 
