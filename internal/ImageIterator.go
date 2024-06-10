@@ -24,6 +24,7 @@ type imageIterator[T image.Image] struct {
 	rowBufferSouth           []color.Color
 	neighbourCount           ImageIteratorNeighbourCount
 	current                  imageIteratorYield
+	prgrsCh                  chan uint8
 }
 
 type imageIteratorYield struct {
@@ -34,13 +35,13 @@ type imageIteratorYield struct {
 	X, Y int
 }
 
-func NewImageIterator[T image.Image](img T, neighbourCount ImageIteratorNeighbourCount, startY, endY int) (*imageIterator[T], error) {
+func NewImageIterator[T image.Image](img T, neighbourCount ImageIteratorNeighbourCount, startY, endY int, prgrsCh chan uint8) (*imageIterator[T], error) {
 	var rowBufferNorth, rowBufferSouth []color.Color = nil, nil
 
 	rowBufferNorth = make([]color.Color, img.Bounds().Max.X)
 	rowBufferSouth = make([]color.Color, img.Bounds().Max.X)
 
-	return &imageIterator[T]{img, img.Bounds().Min.X, startY, startY, endY, rowBufferNorth, rowBufferSouth, neighbourCount, imageIteratorYield{}}, nil
+	return &imageIterator[T]{img, img.Bounds().Min.X, startY, startY, endY, rowBufferNorth, rowBufferSouth, neighbourCount, imageIteratorYield{}, prgrsCh}, nil
 }
 
 func (iter *imageIterator[T]) HasNext() bool {
@@ -112,6 +113,8 @@ func (iter *imageIterator[T]) Next() *imageIteratorYield {
 
 	if iter.curX >= iter.img.Bounds().Max.X {
 		iter.curY++
+
+		iter.prgrsCh <- 1
 		iter.curX = 0
 	}
 

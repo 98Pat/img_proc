@@ -11,6 +11,10 @@ import (
 	"sync"
 )
 
+const (
+	CLEAR_LINE = "\033[u\033[K"
+)
+
 type ImageFilterEngineInterface interface {
 	Run(int) error
 	SetFilter(string, []string) error
@@ -46,10 +50,12 @@ func (engine *imageFilterEngine[T]) Run(iterations int) error {
 	rowsPerProc := int(math.Ceil(float64(totalRows) / float64(currMaxProcs)))
 
 	fmt.Println("ROWS", totalRows)
-	fmt.Println("RPP", rowsPerProc)
 	fmt.Println("PRCS", currMaxProcs)
+	fmt.Println("RPP", rowsPerProc)
 
-	for range iterations {
+	prgrsCh := make(chan uint8)
+
+	for it := range iterations {
 		if engine.switchBuffer {
 			engine.switchOutputBuffer()
 		}
@@ -61,9 +67,33 @@ func (engine *imageFilterEngine[T]) Run(iterations int) error {
 
 				//fmt.Println("STARTED GR", id, "FOR (i,j)", id*rowsPerProc, min((id+1)*rowsPerProc, totalRows))
 
-				(*engine.filter).Apply(*engine.imgA, *engine.imgB, id*rowsPerProc, min((id+1)*rowsPerProc, totalRows))
+				(*engine.filter).Apply(*engine.imgA, *engine.imgB, id*rowsPerProc, min((id+1)*rowsPerProc, totalRows), prgrsCh)
 			}(i)
 		}
+
+		engine.wg.Add(1)
+		go func() {
+			defer engine.wg.Done()
+
+			i := 0
+			for range prgrsCh {
+				// check if 1 was written to channel?
+				i++
+				fmt.Print("\r")
+				prgrs := (i * 100) / totalRows
+				fmt.Printf("PRGRS: %2d%%, IT: %d / %d", prgrs, it+1, iterations)
+
+				if i == totalRows {
+					fmt.Print("\r")
+
+					if it+1 == iterations {
+						fmt.Println()
+					}
+
+					return
+				}
+			}
+		}()
 		engine.wg.Wait()
 
 		engine.switchBuffer = true

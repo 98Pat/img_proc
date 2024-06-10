@@ -13,8 +13,8 @@ type EdgeRGBAFilter struct {
 	amp int64
 }
 
-func (filter *EdgeRGBA64Filter) Apply(img, filteredImg *image.RGBA64, startY, endY int) {
-	if iter, err := NewImageIterator(img, DIRECT, startY, endY); err == nil {
+func (filter *EdgeRGBA64Filter) Apply(img, filteredImg *image.RGBA64, startY, endY int, prgrsCh chan uint8) {
+	if iter, err := NewImageIterator(img, DIRECT, startY, endY, prgrsCh); err == nil {
 		for iter.HasNext() {
 			curr := iter.Next()
 
@@ -43,8 +43,8 @@ func (filter *EdgeRGBA64Filter) Apply(img, filteredImg *image.RGBA64, startY, en
 	}
 }
 
-func (filter *EdgeRGBAFilter) Apply(img, filteredImg *image.RGBA, startY, endY int) {
-	if iter, err := NewImageIterator(img, DIRECT, startY, endY); err == nil {
+func (filter *EdgeRGBAFilter) Apply(img, filteredImg *image.RGBA, startY, endY int, prgrsCh chan uint8) {
+	if iter, err := NewImageIterator(img, DIRECT, startY, endY, prgrsCh); err == nil {
 		for iter.HasNext() {
 			curr := iter.Next()
 

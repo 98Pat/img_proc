@@ -103,7 +103,6 @@ func main() {
 		fmt.Println("wrote file to: " + filePath)
 	}
 
-	fmt.Println("done")
 	fmt.Printf("writing process took %d ms\n\n", time.Now().Sub(start).Milliseconds())
 	fmt.Printf("entire process took %d ms", time.Now().Sub(programStart).Milliseconds())
 }

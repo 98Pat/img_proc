@@ -9,8 +9,8 @@ type InvertRGBA64Filter struct{}
 
 type InvertRGBAFilter struct{}
 
-func (filter *InvertRGBA64Filter) Apply(img, filteredImg *image.RGBA64, startY, endY int) {
-	if iter, err := NewImageIterator(img, NONE, startY, endY); err == nil {
+func (filter *InvertRGBA64Filter) Apply(img, filteredImg *image.RGBA64, startY, endY int, prgrsCh chan uint8) {
+	if iter, err := NewImageIterator(img, NONE, startY, endY, prgrsCh); err == nil {
 		for iter.HasNext() {
 			curr := iter.Next()
 
@@ -20,8 +20,8 @@ func (filter *InvertRGBA64Filter) Apply(img, filteredImg *image.RGBA64, startY, 
 	}
 }
 
-func (filter *InvertRGBAFilter) Apply(img, filteredImg *image.RGBA, startY, endY int) {
-	if iter, err := NewImageIterator(img, NONE, startY, endY); err == nil {
+func (filter *InvertRGBAFilter) Apply(img, filteredImg *image.RGBA, startY, endY int, prgrsCh chan uint8) {
+	if iter, err := NewImageIterator(img, NONE, startY, endY, prgrsCh); err == nil {
 		for iter.HasNext() {
 			curr := iter.Next()
 

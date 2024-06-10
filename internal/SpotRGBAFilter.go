@@ -16,8 +16,8 @@ type SpotRGBAFilter struct {
 	spotR        float64
 }
 
-func (filter *SpotRGBA64Filter) Apply(img, filteredImg *image.RGBA64, startY, endY int) {
-	if iter, err := NewImageIterator(img, NONE, startY, endY); err == nil {
+func (filter *SpotRGBA64Filter) Apply(img, filteredImg *image.RGBA64, startY, endY int, prgrsCh chan uint8) {
+	if iter, err := NewImageIterator(img, NONE, startY, endY, prgrsCh); err == nil {
 		for iter.HasNext() {
 			curr := iter.Next()
 
@@ -38,8 +38,8 @@ func (filter *SpotRGBA64Filter) Apply(img, filteredImg *image.RGBA64, startY, en
 	}
 }
 
-func (filter *SpotRGBAFilter) Apply(img, filteredImg *image.RGBA, startY, endY int) {
-	if iter, err := NewImageIterator(img, NONE, startY, endY); err == nil {
+func (filter *SpotRGBAFilter) Apply(img, filteredImg *image.RGBA, startY, endY int, prgrsCh chan uint8) {
+	if iter, err := NewImageIterator(img, NONE, startY, endY, prgrsCh); err == nil {
 		for iter.HasNext() {
 			curr := iter.Next()
 
