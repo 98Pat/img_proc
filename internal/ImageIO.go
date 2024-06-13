@@ -1,7 +1,6 @@
 package internal
 
 import (
-	"fmt"
 	"image"
 	"image/draw"
 	"image/png"
