@@ -5,5 +5,5 @@ import (
 )
 
 type ImageFilterer[T draw.Image] interface {
-	Apply(T, T, int, int, chan uint8)
+	Apply(T, T, int, int, chan int)
 }

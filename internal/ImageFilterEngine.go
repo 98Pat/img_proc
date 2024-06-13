@@ -53,7 +53,7 @@ func (engine *imageFilterEngine[T]) Run(iterations int) error {
 	fmt.Println("PRCS", currMaxProcs)
 	fmt.Println("RPP", rowsPerProc)
 
-	prgrsCh := make(chan uint8)
+	prgrsCh := make(chan int)
 
 	for it := range iterations {
 		if engine.switchBuffer {
@@ -76,12 +76,13 @@ func (engine *imageFilterEngine[T]) Run(iterations int) error {
 			defer engine.wg.Done()
 
 			i := 0
-			for range prgrsCh {
+			for j := range prgrsCh {
 				// check if 1 was written to channel?
-				i++
+
+				i += j
 				fmt.Print("\r")
 				prgrs := (i * 100) / totalRows
-				fmt.Printf("PRGRS: %2d%%, IT: %d / %d", prgrs, it+1, iterations)
+				fmt.Printf("PRGRS: %3d%%, IT: %d / %d", prgrs, it+1, iterations)
 
 				if i == totalRows {
 					fmt.Print("\r")

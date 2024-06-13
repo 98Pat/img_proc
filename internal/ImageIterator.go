@@ -3,6 +3,7 @@ package internal
 import (
 	"image"
 	"image/color"
+	"math"
 )
 
 type ImageIteratorNeighbourCount int
@@ -24,7 +25,9 @@ type imageIterator[T image.Image] struct {
 	rowBufferSouth           []color.Color
 	neighbourCount           ImageIteratorNeighbourCount
 	current                  imageIteratorYield
-	prgrsCh                  chan uint8
+	prgrsCh                  chan int
+	workProgressStep         int
+	j                        int
 }
 
 type imageIteratorYield struct {
@@ -35,13 +38,15 @@ type imageIteratorYield struct {
 	X, Y int
 }
 
-func NewImageIterator[T image.Image](img T, neighbourCount ImageIteratorNeighbourCount, startY, endY int, prgrsCh chan uint8) (*imageIterator[T], error) {
+func NewImageIterator[T image.Image](img T, neighbourCount ImageIteratorNeighbourCount, startY, endY int, prgrsCh chan int) (*imageIterator[T], error) {
 	var rowBufferNorth, rowBufferSouth []color.Color = nil, nil
 
 	rowBufferNorth = make([]color.Color, img.Bounds().Max.X)
 	rowBufferSouth = make([]color.Color, img.Bounds().Max.X)
 
-	return &imageIterator[T]{img, img.Bounds().Min.X, startY, startY, endY, rowBufferNorth, rowBufferSouth, neighbourCount, imageIteratorYield{}, prgrsCh}, nil
+	workProgressStep := int(math.Max(float64((endY-startY)/4), 1))
+
+	return &imageIterator[T]{img, img.Bounds().Min.X, startY, startY, endY, rowBufferNorth, rowBufferSouth, neighbourCount, imageIteratorYield{}, prgrsCh, workProgressStep, 0}, nil
 }
 
 func (iter *imageIterator[T]) HasNext() bool {
@@ -114,7 +119,14 @@ func (iter *imageIterator[T]) Next() *imageIteratorYield {
 	if iter.curX >= iter.img.Bounds().Max.X {
 		iter.curY++
 
-		iter.prgrsCh <- 1
+		if (iter.curY-iter.startY)%iter.workProgressStep == 0 {
+			iter.prgrsCh <- iter.workProgressStep
+			iter.j++
+		} else if iter.curY == iter.endY {
+			iter.prgrsCh <- (iter.endY - iter.startY) % iter.workProgressStep
+			iter.j++
+		}
+
 		iter.curX = 0
 	}
 
