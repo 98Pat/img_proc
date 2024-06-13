@@ -27,7 +27,6 @@ type imageIterator[T image.Image] struct {
 	current                  imageIteratorYield
 	prgrsCh                  chan int
 	workProgressStep         int
-	j                        int
 }
 
 type imageIteratorYield struct {
@@ -46,7 +45,7 @@ func NewImageIterator[T image.Image](img T, neighbourCount ImageIteratorNeighbou
 
 	workProgressStep := int(math.Max(float64((endY-startY)/4), 1))
 
-	return &imageIterator[T]{img, img.Bounds().Min.X, startY, startY, endY, rowBufferNorth, rowBufferSouth, neighbourCount, imageIteratorYield{}, prgrsCh, workProgressStep, 0}, nil
+	return &imageIterator[T]{img, img.Bounds().Min.X, startY, startY, endY, rowBufferNorth, rowBufferSouth, neighbourCount, imageIteratorYield{}, prgrsCh, workProgressStep}, nil
 }
 
 func (iter *imageIterator[T]) HasNext() bool {
@@ -121,10 +120,8 @@ func (iter *imageIterator[T]) Next() *imageIteratorYield {
 
 		if (iter.curY-iter.startY)%iter.workProgressStep == 0 {
 			iter.prgrsCh <- iter.workProgressStep
-			iter.j++
 		} else if iter.curY == iter.endY {
 			iter.prgrsCh <- (iter.endY - iter.startY) % iter.workProgressStep
-			iter.j++
 		}
 
 		iter.curX = 0
