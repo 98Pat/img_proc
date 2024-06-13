@@ -9,8 +9,8 @@ type BlurRGBA64Filter struct{}
 
 type BlurRGBAFilter struct{}
 
-func (filter *BlurRGBA64Filter) Apply(img, filteredImg *image.RGBA64, startY, endY int) {
-	if iter, err := NewImageIterator(img, DIRECT, startY, endY); err == nil {
+func (filter *BlurRGBA64Filter) Apply(img, filteredImg *image.RGBA64, startY, endY int, prgrsCh chan int) {
+	if iter, err := NewImageIterator(img, DIRECT, startY, endY, prgrsCh); err == nil {
 		for iter.HasNext() {
 			curr := iter.Next()
 			var r, g, b, a uint32 = (*curr.Self).RGBA()
@@ -33,8 +33,8 @@ func (filter *BlurRGBA64Filter) Apply(img, filteredImg *image.RGBA64, startY, en
 	}
 }
 
-func (filter *BlurRGBAFilter) Apply(img, filteredImg *image.RGBA, startY, endY int) {
-	if iter, err := NewImageIterator(img, DIRECT, startY, endY); err == nil {
+func (filter *BlurRGBAFilter) Apply(img, filteredImg *image.RGBA, startY, endY int, prgrsCh chan int) {
+	if iter, err := NewImageIterator(img, DIRECT, startY, endY, prgrsCh); err == nil {
 		for iter.HasNext() {
 			curr := iter.Next()
 			var r, g, b, a uint32 = (*curr.Self).RGBA()

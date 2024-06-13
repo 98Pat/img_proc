@@ -26,8 +26,8 @@ type HeatRGBA64Filter struct {
 type HeatRGBAFilter struct {
 }
 
-func (filter *HeatRGBA64Filter) Apply(img, filteredImg *image.RGBA64, startY, endY int) {
-	if iter, err := NewImageIterator(img, NONE, startY, endY); err == nil {
+func (filter *HeatRGBA64Filter) Apply(img, filteredImg *image.RGBA64, startY, endY int, prgrsCh chan int) {
+	if iter, err := NewImageIterator(img, NONE, startY, endY, prgrsCh); err == nil {
 		for iter.HasNext() {
 			curr := iter.Next()
 
@@ -42,8 +42,8 @@ func (filter *HeatRGBA64Filter) Apply(img, filteredImg *image.RGBA64, startY, en
 	}
 }
 
-func (filter *HeatRGBAFilter) Apply(img, filteredImg *image.RGBA, startY, endY int) {
-	if iter, err := NewImageIterator(img, NONE, startY, endY); err == nil {
+func (filter *HeatRGBAFilter) Apply(img, filteredImg *image.RGBA, startY, endY int, prgrsCh chan int) {
+	if iter, err := NewImageIterator(img, NONE, startY, endY, prgrsCh); err == nil {
 		for iter.HasNext() {
 			curr := iter.Next()
 
