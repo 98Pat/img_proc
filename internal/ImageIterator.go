@@ -11,6 +11,8 @@ type ImageIteratorNeighbourCount int
 const (
 	NONE   ImageIteratorNeighbourCount = 0
 	DIRECT ImageIteratorNeighbourCount = 4
+
+	WORK_PROGRESS_STEP_MULT int = 2
 )
 
 type ImageIterator interface {
@@ -43,7 +45,7 @@ func NewImageIterator[T image.Image](img T, neighbourCount ImageIteratorNeighbou
 	rowBufferNorth = make([]color.Color, img.Bounds().Max.X)
 	rowBufferSouth = make([]color.Color, img.Bounds().Max.X)
 
-	workProgressStep := int(math.Max(float64((endY-startY)/4), 1))
+	workProgressStep := int(math.Max(float64((endY-startY)/WORK_PROGRESS_STEP_MULT), 1))
 
 	return &imageIterator[T]{img, img.Bounds().Min.X, startY, startY, endY, rowBufferNorth, rowBufferSouth, neighbourCount, imageIteratorYield{}, prgrsCh, workProgressStep}, nil
 }

@@ -45,7 +45,7 @@ func (engine *imageFilterEngine[T]) Run(iterations int) error {
 		return errors.New("filter not set")
 	}
 
-	currMaxProcs := runtime.GOMAXPROCS(0)
+	currMaxProcs := runtime.GOMAXPROCS(0) * 2
 	totalRows := (*engine.imgA).Bounds().Max.Y
 	rowsPerProc := int(math.Ceil(float64(totalRows) / float64(currMaxProcs)))
 
@@ -53,7 +53,7 @@ func (engine *imageFilterEngine[T]) Run(iterations int) error {
 	fmt.Println("PRCS", currMaxProcs)
 	fmt.Println("RPP", rowsPerProc)
 
-	prgrsCh := make(chan int)
+	prgrsCh := make(chan int, currMaxProcs)
 
 	for it := range iterations {
 		if engine.switchBuffer {
@@ -75,16 +75,14 @@ func (engine *imageFilterEngine[T]) Run(iterations int) error {
 		go func() {
 			defer engine.wg.Done()
 
-			i := 0
-			for j := range prgrsCh {
-				// check if 1 was written to channel?
-
-				i += j
+			processedRows := 0
+			for workProgressUpdate := range prgrsCh {
+				processedRows += workProgressUpdate
 				fmt.Print("\r")
-				prgrs := (i * 100) / totalRows
+				prgrs := (processedRows * 100) / totalRows
 				fmt.Printf("PRGRS: %3d%%, IT: %d / %d", prgrs, it+1, iterations)
 
-				if i == totalRows {
+				if processedRows == totalRows {
 					fmt.Print("\r")
 
 					if it+1 == iterations {
