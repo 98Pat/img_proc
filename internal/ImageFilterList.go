@@ -52,7 +52,7 @@ var rgba64FilterConstructors = map[string]FilterConstructor{
 
 		if len(args) >= 1 {
 			if a, err := strconv.ParseInt(args[0], 10, 64); err != nil {
-				return nil, errors.New("first non-flag arguments needs to be an amplification modifier for this filter (int)")
+				return nil, errors.New("first non-flag argument needs to be an amplification modifier for this filter (int)")
 			} else {
 				amp = a
 			}
@@ -63,6 +63,17 @@ var rgba64FilterConstructors = map[string]FilterConstructor{
 	},
 	"heat": func(args []string) (interface{}, error) {
 		return &HeatRGBA64Filter{}, nil
+	},
+	"gaussianblur": func(args []string) (interface{}, error) {
+		if len(args) >= 1 {
+			if radius, err := strconv.ParseInt(args[0], 10, 64); err != nil {
+				return nil, errors.New("first non-flag argument needs to be a radius modifier for this filter (int)")
+			} else {
+				return &GaussianBlurRGBA64Filter{int(radius*2 + 1), buildKernel(int(radius)*2 + 1)}, nil
+			}
+		} else {
+			return &GaussianBlurRGBAFilter{5, buildKernel(5)}, nil
+		}
 	},
 }
 
@@ -120,6 +131,17 @@ var rgbaFilterConstructors = map[string]FilterConstructor{
 	},
 	"heat": func(args []string) (interface{}, error) {
 		return &HeatRGBAFilter{}, nil
+	},
+	"gaussianblur": func(args []string) (interface{}, error) {
+		if len(args) >= 1 {
+			if radius, err := strconv.ParseInt(args[0], 10, 64); err != nil {
+				return nil, errors.New("first non-flag argument needs to be a radius modifier for this filter (int) default 5")
+			} else {
+				return &GaussianBlurRGBAFilter{int(radius*2 + 1), buildKernel(int(radius)*2 + 1)}, nil
+			}
+		} else {
+			return &GaussianBlurRGBAFilter{5, buildKernel(5)}, nil
+		}
 	},
 }
 

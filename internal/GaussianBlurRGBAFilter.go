@@ -11,18 +11,38 @@ type GaussianBlurRGBA64Filter struct {
 	kernel     [][]float64
 }
 
+type GaussianBlurRGBAFilter struct {
+	kernelSize int
+	kernel     [][]float64
+}
+
 func (filter *GaussianBlurRGBA64Filter) Apply(img, filteredImg *image.RGBA64, startY, endY int, prgrsCh chan int) {
 	if iter, err := NewImageIterator(img, NONE, startY, endY, prgrsCh); err == nil {
 		for iter.HasNext() {
 			curr := iter.Next()
 
 			values := getKernelValues(img, filter.kernelSize, curr.X, curr.Y)
+			r, g, b, a := applyKernelToValues(values, filter.kernel, filter.kernelSize)
+			clr := color.RGBA64{uint16(r), uint16(g), uint16(b), uint16(a)}
+			filteredImg.SetRGBA64(curr.X, curr.Y, clr)
 		}
 	}
 }
 
-func applyKernelToValues(values [][]color.Color, kernel [][]float64, kernelSize int) {
-	var r, g, b, a float64 = 0, 0, 0, 0
+func (filter *GaussianBlurRGBAFilter) Apply(img, filteredImg *image.RGBA, startY, endY int, prgrsCh chan int) {
+	if iter, err := NewImageIterator(img, NONE, startY, endY, prgrsCh); err == nil {
+		for iter.HasNext() {
+			curr := iter.Next()
+
+			values := getKernelValues(img, filter.kernelSize, curr.X, curr.Y)
+			r, g, b, a := applyKernelToValues(values, filter.kernel, filter.kernelSize)
+			clr := color.RGBA{uint8(r), uint8(g), uint8(b), uint8(a)}
+			filteredImg.SetRGBA(curr.X, curr.Y, clr)
+		}
+	}
+}
+
+func applyKernelToValues(values [][]color.Color, kernel [][]float64, kernelSize int) (r, g, b, a float64) {
 	for x := range kernelSize {
 		for y := range kernelSize {
 			if clr := values[x][y]; clr != nil {
@@ -32,12 +52,11 @@ func applyKernelToValues(values [][]color.Color, kernel [][]float64, kernelSize 
 				g += float64(vg) * kVal
 				b += float64(vb) * kVal
 				a += float64(va) * kVal
-			} else {
-				// mirroring? check kernel image proc wiki on convolution
-				clr := values[]
 			}
 		}
 	}
+
+	return
 }
 
 func getKernelValues[T image.Image](img T, kernelSize int, x int, y int) [][]color.Color {
@@ -46,20 +65,25 @@ func getKernelValues[T image.Image](img T, kernelSize int, x int, y int) [][]col
 		kernelValues[k] = make([]color.Color, kernelSize)
 	}
 
+	//fmt.Printf("CALL X %d CALL Y %d\n", x, y)
 	bnds := img.Bounds()
 	kOffset := int(math.Floor(float64(kernelSize) / 2.0))
 	kOffsetX := x - kOffset
 	kOffsetY := y - kOffset
-	for kX := kOffsetX; kX < kX+kernelSize; kX++ {
-		for kY := kOffsetY; kY < kY+kernelSize; kY++ {
-			if kX < bnds.Min.X || kX >= bnds.Max.X {
-				continue
+	for kY := -kOffset; kY < kOffset; kY++ {
+		for kX := -kOffset; kX < kOffset; kX++ {
+			kIdxX := kX + kOffsetX
+			kIdxY := kY + kOffsetY
+
+			if kIdxX < bnds.Min.X || kIdxX >= bnds.Max.X {
+				kIdxX = (2*bnds.Max.X - (kIdxX)) % bnds.Max.X
 			}
-			if kY < bnds.Min.Y || kY >= bnds.Max.Y {
-				continue
+			if kIdxY < bnds.Min.Y || kIdxY >= bnds.Max.Y {
+				kIdxY = (2*bnds.Max.Y - (kIdxY)) % bnds.Max.Y
 			}
 
-			kernelValues[kX-kOffsetX][kY-kOffsetY] = img.At(kX-kOffsetX, kY-kOffsetY)
+			//fmt.Printf("X %d Y %d\n", kIdxX, kIdxY)
+			kernelValues[kX+kOffset][kY+kOffset] = img.At(kIdxX, kIdxY)
 		}
 	}
 

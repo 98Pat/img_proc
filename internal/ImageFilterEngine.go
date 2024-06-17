@@ -12,7 +12,8 @@ import (
 )
 
 const (
-	CLEAR_LINE = "\033[u\033[K"
+	CLEAR_LINE     = "\033[u\033[K"
+	GOROUTINE_MULT = 1
 )
 
 type ImageFilterEngineInterface interface {
@@ -45,7 +46,7 @@ func (engine *imageFilterEngine[T]) Run(iterations int) error {
 		return errors.New("filter not set")
 	}
 
-	currMaxProcs := runtime.GOMAXPROCS(0) * 2
+	currMaxProcs := runtime.GOMAXPROCS(0) * GOROUTINE_MULT
 	totalRows := (*engine.imgA).Bounds().Max.Y
 	rowsPerProc := int(math.Ceil(float64(totalRows) / float64(currMaxProcs)))
 
