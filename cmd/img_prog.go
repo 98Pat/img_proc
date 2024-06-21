@@ -20,9 +20,11 @@ var (
 			"\tcomic (color step count (int) default 3)\n"+
 			"\tspot (posX, posY, radius (int) required)\n"+
 			"\tedge (amplification (int) default 1)\n"+
-			"\theat")
+			"\theat\n"+
+			"\tgaussianblur (kernel size/radius (int) default 5")
 	iterationFlag      = flag.Int("I", 1, "iteration count of filter")
 	outputFilePathFlag = flag.String("o", "", "file output path")
+	coreCountFlag      = flag.Int("c", 0, "number of logical processors used, default max available")
 )
 
 func main() {
@@ -69,11 +71,11 @@ func main() {
 	switch _img := img.(type) {
 	case *image.RGBA64:
 		tmpImg := image.NewRGBA64(img.Bounds())
-		fe := internal.NewImageFilterEngine(*imageFlag, *outputFilePathFlag, _img, tmpImg)
+		fe := internal.NewImageFilterEngine(*imageFlag, *outputFilePathFlag, _img, tmpImg, *coreCountFlag)
 		filterEngine = fe
 	case *image.RGBA:
 		tmpImg := image.NewRGBA(img.Bounds())
-		fe := internal.NewImageFilterEngine(*imageFlag, *outputFilePathFlag, _img, tmpImg)
+		fe := internal.NewImageFilterEngine(*imageFlag, *outputFilePathFlag, _img, tmpImg, *coreCountFlag)
 		filterEngine = fe
 	default:
 		fmt.Println("unsupported image type")

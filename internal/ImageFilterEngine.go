@@ -12,8 +12,7 @@ import (
 )
 
 const (
-	CLEAR_LINE     = "\033[u\033[K"
-	GOROUTINE_MULT = 1
+	CLEAR_LINE = "\033[u\033[K"
 )
 
 type ImageFilterEngineInterface interface {
@@ -35,10 +34,11 @@ type imageFilterEngine[T draw.Image] struct {
 	outputImg      *T
 	wg             sync.WaitGroup
 	switchBuffer   bool
+	coreCount      int
 }
 
-func NewImageFilterEngine[T draw.Image](filePath, outputFilePath string, imgA, imgB T) *imageFilterEngine[T] {
-	return &imageFilterEngine[T]{filePath, nil, "", outputFilePath, &imgA, &imgB, &imgB, sync.WaitGroup{}, false}
+func NewImageFilterEngine[T draw.Image](filePath, outputFilePath string, imgA, imgB T, coreCount int) *imageFilterEngine[T] {
+	return &imageFilterEngine[T]{filePath, nil, "", outputFilePath, &imgA, &imgB, &imgB, sync.WaitGroup{}, false, coreCount}
 }
 
 func (engine *imageFilterEngine[T]) Run(iterations int) error {
@@ -46,7 +46,13 @@ func (engine *imageFilterEngine[T]) Run(iterations int) error {
 		return errors.New("filter not set")
 	}
 
-	currMaxProcs := runtime.GOMAXPROCS(0) * GOROUTINE_MULT
+	var currMaxProcs int
+	if engine.coreCount == 0 {
+		currMaxProcs = runtime.GOMAXPROCS(0)
+	} else {
+		currMaxProcs = engine.coreCount
+	}
+
 	totalRows := (*engine.imgA).Bounds().Max.Y
 	rowsPerProc := int(math.Ceil(float64(totalRows) / float64(currMaxProcs)))
 
