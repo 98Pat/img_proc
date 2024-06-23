@@ -12,7 +12,7 @@ const (
 	NONE   ImageIteratorNeighbourCount = 0
 	DIRECT ImageIteratorNeighbourCount = 4
 
-	WORK_PROGRESS_STEP_MULT int = 2
+	WORK_PROGRESS_STEP_MULT int = 8
 )
 
 type ImageIterator interface {

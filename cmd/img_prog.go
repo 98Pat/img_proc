@@ -21,7 +21,7 @@ var (
 			"\tspot (posX, posY, radius (int) required)\n"+
 			"\tedge (amplification (int) default 1)\n"+
 			"\theat\n"+
-			"\tgaussianblur (kernel size/radius (int) default 5")
+			"\tgaussianblur (kernel size/radius (int) default 5)")
 	iterationFlag      = flag.Int("I", 1, "iteration count of filter")
 	outputFilePathFlag = flag.String("o", "", "file output path")
 	coreCountFlag      = flag.Int("c", 0, "number of logical processors used, default max available")

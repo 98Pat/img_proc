@@ -102,8 +102,7 @@ func getKernelValues[T image.Image](img T, kernelSize int, x int, y int) [][]col
 	return kernelValues
 }
 
-func buildKernel(kernelSize int) [][]float64 {
-	const sigma float64 = 1
+func buildKernel(kernelSize int, sigma float64) [][]float64 {
 	var kernel [][]float64 = make([][]float64, kernelSize)
 	for k := range kernelSize {
 		kernel[k] = make([]float64, kernelSize)

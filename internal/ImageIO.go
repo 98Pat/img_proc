@@ -1,8 +1,10 @@
 package internal
 
 import (
+	"errors"
 	"image"
 	"image/draw"
+	_ "image/jpeg"
 	"image/png"
 	"os"
 )
@@ -12,8 +14,20 @@ func ReadImage(filepath string) (image.Image, error) {
 		return nil, err
 	} else {
 		defer file.Close()
-		image, _, err := image.Decode(file)
-		return image, err
+		img, _, err := image.Decode(file)
+
+		switch img.(type) {
+		case *image.RGBA64:
+		case *image.RGBA:
+		case *image.YCbCr:
+			rgbaImg := image.NewRGBA(img.Bounds())
+			draw.Draw(rgbaImg, img.Bounds(), img, image.Point{}, draw.Src)
+			img = rgbaImg
+		default:
+			return nil, errors.New("unsupported image type")
+		}
+
+		return img, err
 	}
 }
 

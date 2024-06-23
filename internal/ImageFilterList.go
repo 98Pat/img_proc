@@ -65,14 +65,25 @@ var rgba64FilterConstructors = map[string]FilterConstructor{
 		return &HeatRGBA64Filter{}, nil
 	},
 	"gaussianblur": func(args []string) (interface{}, error) {
-		if len(args) >= 1 {
-			if radius, err := strconv.ParseInt(args[0], 10, 64); err != nil {
+		if len(args) >= 2 {
+			var radius int64
+			var sigma float64
+
+			if rad, err := strconv.ParseInt(args[0], 10, 64); err != nil {
 				return nil, errors.New("first non-flag argument needs to be a radius modifier for this filter (int)")
 			} else {
-				return &GaussianBlurRGBA64Filter{int(radius*2 + 1), buildKernel(int(radius)*2 + 1)}, nil
+				radius = rad
 			}
+
+			if sig, err := strconv.ParseFloat(args[0], 64); err != nil {
+				return nil, errors.New("second non-flag argument needs to be a sigma value for this filters kernel (float)")
+			} else {
+				sigma = sig
+			}
+
+			return &GaussianBlurRGBA64Filter{int(radius*2 + 1), buildKernel(int(radius)*2+1, sigma)}, nil
 		} else {
-			return &GaussianBlurRGBAFilter{5, buildKernel(5)}, nil
+			return &GaussianBlurRGBA64Filter{5, buildKernel(5, 2.0)}, nil
 		}
 	},
 }
@@ -133,14 +144,25 @@ var rgbaFilterConstructors = map[string]FilterConstructor{
 		return &HeatRGBAFilter{}, nil
 	},
 	"gaussianblur": func(args []string) (interface{}, error) {
-		if len(args) >= 1 {
-			if radius, err := strconv.ParseInt(args[0], 10, 64); err != nil {
-				return nil, errors.New("first non-flag argument needs to be a radius modifier for this filter (int) default 5")
+		if len(args) >= 2 {
+			var radius int64
+			var sigma float64
+
+			if rad, err := strconv.ParseInt(args[0], 10, 64); err != nil {
+				return nil, errors.New("first non-flag argument needs to be a radius modifier for this filter (int)")
 			} else {
-				return &GaussianBlurRGBAFilter{int(radius*2 + 1), buildKernel(int(radius)*2 + 1)}, nil
+				radius = rad
 			}
+
+			if sig, err := strconv.ParseFloat(args[0], 64); err != nil {
+				return nil, errors.New("second non-flag argument needs to be a sigma value for this filters kernel (float)")
+			} else {
+				sigma = sig
+			}
+
+			return &GaussianBlurRGBAFilter{int(radius*2 + 1), buildKernel(int(radius)*2+1, sigma)}, nil
 		} else {
-			return &GaussianBlurRGBAFilter{5, buildKernel(5)}, nil
+			return &GaussianBlurRGBAFilter{5, buildKernel(5, 2.0)}, nil
 		}
 	},
 }
