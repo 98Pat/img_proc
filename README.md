@@ -59,8 +59,8 @@ Non-flag arguments cannot be followed by flag-arguments.
   **Required**
 
 - `-o string`  
-  **Description**: Path to the output image file.  
-  **Required**
+  **Description**: Path to the output image file.
+  **Default**: Extends file name by '_[filter name]'
 
 ### Example Usage
 
