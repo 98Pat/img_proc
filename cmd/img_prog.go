@@ -14,14 +14,16 @@ var (
 	imageFlag  = flag.String("i", "", "path to the image")
 	filterFlag = flag.String("f", "",
 		"type of filter to be applied\n"+
+			"followed by required/optional non-flag arguments\n"+
+			"non-flag arguments can't be followed by other flags\n"+
 			"list of filters:\n"+
 			"\tblur\n"+
 			"\tinvert\n"+
-			"\tcomic (color step count (int) default 3)\n"+
-			"\tspot (posX, posY, radius (int) required)\n"+
-			"\tedge (amplification (int) default 1)\n"+
+			"\tcomic        (optional: color step count   (int) default 3)\n"+
+			"\tspot         (required: posX, posY, radius (int, int, float))\n"+
+			"\tedge         (optional: amplification      (int) default 1)\n"+
 			"\theat\n"+
-			"\tgaussianblur (kernel size/radius (int) default 5)")
+			"\tgaussianblur (optional: kernel size/radius, sigma (int, float) default 5, 2.0)")
 	iterationFlag      = flag.Int("I", 1, "iteration count of filter")
 	outputFilePathFlag = flag.String("o", "", "file output path")
 	coreCountFlag      = flag.Int("c", 0, "number of logical processors used, default max available")
